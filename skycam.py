@@ -31,3 +31,5 @@ class Drive(Skycam):
 class PanTilt(Skycam):
     def center(self):
         tilt.value = .75
+#while True:
+#    Skycam.mainloop()

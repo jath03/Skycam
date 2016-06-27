@@ -1,6 +1,7 @@
 import time
 import threading
 from gpiozero import *
+import sys
 endstop_front = Button(20)
 endstop_back = Button(16)
 drive = PWMOutputDevice(2, frequency=300, initial_value=False)
@@ -42,12 +43,12 @@ class Drive(Skycam):
 class PanTilt(Skycam):
     def center(self):
         tilt.value = .75
+def webinterface():
+    dr = drive.value
+    pn = pan.value
+    tlt = tilt.value
+    return dr, pn, tlt
+    
+    
 #while True:
 #    Skycam.mainloop()
-while True:
-    print('-----')
-    print(endstop_front.is_pressed)
-    print(' ')
-    print(endstop_back.is_pressed)
-    print('-----')
-    time.sleep(1)

@@ -1,16 +1,13 @@
-import tty
 import time
 import threading
-import gpiozero
+from gpiozero import *
 import sys
-import termios
 import server
-endstop_front = gpiozero.Button(16)
-endstop_back = gpiozero.Button(12)
-drive = gpiozero.PWMOutputDevice(2, frequency=300)
-pan = gpiozero.PWMOutputDevice(3, frequency=300)
-tilt = gpiozero.PWMOutputDevice(4, frequency=300)
-
+endstop_front = Button(16)
+endstop_back = Button(12)
+drive = PWMOutputDevice(2, frequency=300, initial_value=False)
+pan = PWMOutputDevice(3, frequency=300, initial_value=False)
+tilt = PWMOutputDevice(4, frequency=300, initial_value=False)
 class Skycam:
     def keyInput(self):
         fd = sys.stdin.fileno()
@@ -27,8 +24,7 @@ class Skycam:
         
 class Drive(Skycam):
     def __init__(self):
-        stop_thread = threading.Thread(target=self.end())
-        stop_thread.start()
+        th = threading.Thread(target=self.end())
     def forward(self, speed=1):
         drive.value = .3
     def backward(self, speed=1):
@@ -43,8 +39,9 @@ class Drive(Skycam):
             elif key == 'Down':
                 self.backward()
     def end(self):
-        while endstop_front.value or endstop_back.value == True:
-            self.stop()
+        while True:
+            if endstop_front or endstop_back == True:
+                self.stop()
             
 class PanTilt(Skycam):
     def center(self):
@@ -54,8 +51,8 @@ def webinterface():
     pn = pan.value
     tlt = tilt.value
     return dr, pn, tlt
-   
-drive_thread = threading.Thread(target=Drive.control(Drive))
-drive_thread.start()
-bg_server.start()
-
+    
+#stop_thread = threading.Thread(target=Drive.end)
+#drive_thread = threading.Thread(target=Drive.control)
+#stop_thread.start()
+#drive_thread.start()

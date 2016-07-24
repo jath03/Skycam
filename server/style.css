@@ -1,0 +1,29 @@
+h1 {
+	font-size: 40px;
+	font-family: Comic Sans MS;
+}
+span {
+	color: #ffffff;
+}
+#nav {
+	float: left;
+	background-color: #eeeeee;
+	padding: 5px;
+}
+#header {
+	text-align: center;
+	padding: 5px;
+	background-color: #0000e6;
+	color: white;
+}
+#about {
+	float: right;
+	padding: 5px;
+	background-color: #eeeeee;
+	text-align: center;
+}
+#section1 {
+	float: center;
+	padding: 5px;
+	text-align:center;
+}

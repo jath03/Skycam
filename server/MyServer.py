@@ -13,14 +13,14 @@ class MyHandler(BaseHTTPRequestHandler):
             self.send_header('Content-type', f_type_map[ex])
             self.end_headers()
             print(ex)
-            if ex == '.html' or '.css' or '.js':
+            try:
                 with open('C:\\Users\jackt.JACK-IS-AWESOME\Documents\GitHub\jath03.github.io%s'% self.path) as file:
                     f = file.read()
                     self.wfile.write(bytes(f, 'utf8'))
-            elif ex == '.jpg' or '.png' or '.ico' or '.gif':
+            except UnicodeDecodeError:
                 with open('C:\\Users\jackt.JACK-IS-AWESOME\Documents\GitHub\jath03.github.io%s'% self.path, 'rb') as f:
-                    self.wfile.write(bytes(str(f), 'utf8'))
-           
+                    file = f.read()
+                    self.wfile.write(file)
         except IOError:
             self.send_response(404, 'Not found')
             self.wfile.write(bytes('404 file not found', 'utf8'))
@@ -38,6 +38,7 @@ def run():
     print('starting server ...')
     httpd = HTTPServer(server_address, MyHandler)
     httpd.serve_forever()
+	
 bg_server= threading.Thread(target = run)
 ###Uncomment the next line if you want to have the server start when the file is run###
 bg_server.start()

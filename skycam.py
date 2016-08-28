@@ -1,6 +1,6 @@
 #!/usr/bin/python3 -i
 import os, tty, time, threading, gpiozero, sys, termios, curtsies, argparse, colors, picamera
-from server import MyServer
+from server import Server
 from http.server import HTTPServer
 #The two endstops are defined as buttons
 endstop_front = gpiozero.Button(12)
@@ -131,12 +131,12 @@ class Skycam:
         if args.public == True:
             print(colors.red('Going public'))
             server_address = ('192.168.1.200', 7777)
-            httpd = HTTPServer(server_address, MyServer.MyHandler)
+            httpd = HTTPServer(server_address, Server.MyHandler)
             httpd.serve_forever()
         else:
             print(colors.green('Staying private'))
             server_address = ('192.168.1.200', 80)
-            httpd = HTTPServer(server_address, MyServer.MyHandler)
+            httpd = HTTPServer(server_address, Server.MyHandler)
             httpd.serve_forever()
     def flip(self):
         while True:

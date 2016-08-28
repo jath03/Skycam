@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+
+<html lang="en">
+	<head>
+		<link type="text/css" rel="stylesheet" href="style.css">
+		<title>Jack.com</title>
+		<meta name="google-signin-client_id" content="848875859423-snhij0t46dhiprnjhg3k1ufvquqli8ab.apps.googleusercontent.com"/>
+		<meta charset="utf-8"/>
+	</head>
+	<body>
+		<div id="header">
+			<h1>Jack's Website</h1>
+		</div>
+		<div id="nav">
+			<h5 id='username'></h5>
+			
+			<ul>
+				<li><a href='#' onclick='signout();'>Sign Out</a></li>
+			</ul>
+		</div>
+		<div id="about">
+			<h3>Me</h3>
+			<a href="https://twitter.com/jath003" class="twitter-follow-button" data-show-count="false">Follow @jath003</a>
+			<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+			<p>Hello, I am Jack also known on many <br>accounts as jath03 or jath003.  I like<br> raspberry pi, music, twitter,<br>	 github(who hosts this webpage), and books.</p> 
+		</div>
+		<center>
+			<div id="section1">
+				<script>
+					function signout() {
+						var auth2 = gapi.auth2.getAuthInstance();
+						auth2.signOut().then(function () {
+							console.log('User signed out.');
+							window.location.href = 'http://192.168.1.200/login.html';
+						});
+					};
+					function onLoad() {
+						gapi.load('auth2', function() {
+							gapi.auth2.init();
+							
+							window.auth2 = gapi.auth2.getAuthInstance();
+							window.auth2.signIn().then(function() {
+								window.profile = window.auth2.currentUser.get().getBasicProfile();
+								console.log(window.profile)
+							
+								if (window.auth2.isSignedIn.get()) {
+								}
+								else {
+									console.log(window.auth2.isSignedIn.get())
+									window.location.href = 'http://localhost:8989/login.html';
+								};
+								var user = window.auth2.currentUser.get();
+								console.log(user)
+								var profile = window.auth2.currentUser.get().getBasicProfile();
+								console.log(window.auth2.currentUser.get().getBasicProfile().getName());
+								document.getElementById("username").innerHTML = 'Hello ' + profile.getName();
+							});
+						});
+					};
+					function goToSkycam() {
+						window.location.href = 'http://192.168.1.200/skycam.html'
+					}
+				</script>
+				<script src="https://apis.google.com/js/platform.js?onload=onLoad" async defer></script>
+				<select id="dropdown">
+					<option value="Skycam" onclick="goToSkycam">Skycam</option>
+				</select>
+					
+			</div>
+		</center>
+	</bocy>
+</html>

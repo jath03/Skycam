@@ -1,4 +1,4 @@
-#!/usr/bin/python3 -i
+#!/usr/local/bin/python3.5 -i
 import os, tty, time, threading, gpiozero, sys, termios, curtsies, argparse, colors, picamera
 from server import Server
 from http.server import HTTPServer

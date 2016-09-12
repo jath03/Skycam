@@ -20,7 +20,7 @@ class MyHandler(BaseHTTPRequestHandler):
                     file = f.read()
                     self.wfile.write(file)
         except IOError:
-            self.send_response(404, 'File Not Found')
+            self.send_error(404, 'File Not Found')
             self.wfile.write(bytes('404 file not found', 'utf8'))
         except KeyError:
             self.send_response(200)

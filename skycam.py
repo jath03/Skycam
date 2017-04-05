@@ -1,7 +1,8 @@
 #!/usr/bin/python3.5
-
+from PyQt5.QtCore import QObject
 from communication import Communication
 from streamer import Streamer
+
 
 class Skycam(QObject):
     def __init__(self, communication=None):

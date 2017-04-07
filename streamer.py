@@ -1,5 +1,8 @@
 import sys
-from PyQt5.QtCore import QThread, pyqtSignal, pyqtSlot
+
+import time
+from PyQt5.QtCore import QThread, pyqtSignal, pyqtSlot, QObject
+from PyQt5.QtGui import QImage
 from PyQt5.QtWidgets import QApplication
 from flask import Flask, render_template, Response
 import cv2
@@ -8,22 +11,29 @@ import json
 fapp = Flask(__name__)
 
 
-class Streamer(QThread):
-    flipEvt = pyqtSignal(object)
+class Streamer(QObject):
+    flipEvt = pyqtSignal()
+    errEvt = pyqtSignal(object)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        print('starting streamer')
         self.cam = cv2.VideoCapture(0)
         self.flipped = False
         self.flipEvt.connect(self.flip)
+        print('done initiating streamer')
 
     @fapp.route('/')
-    def video_feed(self):
-        return Response(self.stream(self.cam), mimetype='multipart/x-mixed-replace; boundary=frame')
+    def video_feed():
+        return Response(self.stream(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
-    def stream(self, cam):
+    def stream(self):
         while True:
-            s, img = cam.read()
+            time.sleep(.05)
+            s, img = self.cam.read()
+            print('Camera working? ' + s)
+            if not s:
+                self.cam.release()
             if self.flipped:
                 (h, w) = img.shape[:2]
                 center = (w / 2, h / 2)
@@ -34,10 +44,32 @@ class Streamer(QThread):
             yield b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n'
 
     def run(self):
-        fapp.run(host='localhost', port=7777, debug=True)
+        print('starting streaming')
+        try:
+            fapp.run(host='localhost', port=7777, debug=True)
+        except Exception as e:
+            self.errEvt.emit(e)
 
-    @pyqtSlot(object)
-    def flip(self, evt=None):
-        print('filpping', evt)
+    @pyqtSlot()
+    def flip(self):
+        print('filpping')
         self.flipped = not self.flipped
         print(self.flipped)
+
+
+class StreamReciever(QObject):
+    newImage = pyqtSignal(QImage, int)
+    def __init__(self, address):
+        super().__init__()
+        self.address = address
+
+    def run(self):
+        cap = cv2.VideoCapture(self.address)
+        while cap.isOpened():
+            _, frame = cap.read()
+            image = QImage(frame.tostring(), 640, 480, QImage.Format_RGB888).rgbSwapped()
+            self.newImage.emit(image, self.id)
+
+if __name__ == '__main__':
+    st = Streamer()
+    st.run()

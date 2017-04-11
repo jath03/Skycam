@@ -9,6 +9,9 @@ import cv2
 import json
 
 fapp = Flask(__name__)
+cam = cv2.VideoCapture(-1)
+global flipped
+flipped = False
 
 
 class Streamer(QObject):
@@ -17,24 +20,17 @@ class Streamer(QObject):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        print('starting streamer')
-        self.cam = cv2.VideoCapture(0)
-        self.flipped = False
         self.flipEvt.connect(self.flip)
-        print('done initiating streamer')
-
-    @fapp.route('/')
-    def video_feed():
-        return Response(self.stream(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
     def stream(self):
         while True:
             time.sleep(.05)
-            s, img = self.cam.read()
-            print('Camera working? ' + s)
+            s, img = cam.read()
+            print('Camera working?', s)
             if not s:
-                self.cam.release()
-            if self.flipped:
+                cam.release()
+                continue
+            if flipped:
                 (h, w) = img.shape[:2]
                 center = (w / 2, h / 2)
                 M = cv2.getRotationMatrix2D(center, 180, 1.0)
@@ -43,17 +39,12 @@ class Streamer(QObject):
             frame = jpg.tobytes()
             yield b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n'
 
-    def run(self):
-        print('starting streaming')
-        try:
-            fapp.run(host='localhost', port=7777, debug=True)
-        except Exception as e:
-            self.errEvt.emit(e)
 
     @pyqtSlot()
     def flip(self):
         print('filpping')
-        self.flipped = not self.flipped
+        global flipped
+        flipped = not flipped
         print(self.flipped)
 
 
@@ -70,6 +61,15 @@ class StreamReciever(QObject):
             image = QImage(frame.tostring(), 640, 480, QImage.Format_RGB888).rgbSwapped()
             self.newImage.emit(image, self.id)
 
+
+@fapp.route('/')
+def video_feed():
+    return Response(st.stream(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
 if __name__ == '__main__':
-    st = Streamer()
-    st.run()
+    try:
+        st = Streamer()
+        fapp.run(host='localhost', port=7777, debug=True)
+    except:
+        cam.release()
+        raise

@@ -66,10 +66,15 @@ class StreamReciever(QObject):
 def video_feed():
     return Response(st.stream(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
-if __name__ == '__main__':
+def main(streamer):
     try:
-        st = Streamer()
+        global st
+        st = streamer
         fapp.run(host='localhost', port=7777, debug=True)
     except:
         cam.release()
         raise
+
+if __name__ == '__main__':
+    s = Streamer()
+    main(s)

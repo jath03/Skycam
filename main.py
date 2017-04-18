@@ -11,16 +11,20 @@ from streamer import StreamReciever
 
 
 class SkycamWidget(QWidget):
-    def __init__(self, skycam=Skycam(), streams=[]):
+    def __init__(self, streams=[]):
+        print('initiating skycam widget')
         super().__init__()
-        self.skycam = skycam
+        self.skycam = Skycam()
         self.streams = dict()
+        self.th = list()
         for i in range(len(streams)):
             self.streams[str(i)] = streams[i]
         print(self.streams)
         self.init_tabwidget()
         self.init_streams()
         self.init_layout()
+        print('initiated skycam widget')
+
 
     def init_layout(self):
         hbox = QHBoxLayout()
@@ -36,6 +40,7 @@ class SkycamWidget(QWidget):
 
     def init_streams(self):
         for id, stream in self.streams.items():
+            print('initiating stream', id)
             lb = QLabel()
             stream.id = id
             stream.lb = lb
@@ -43,6 +48,7 @@ class SkycamWidget(QWidget):
             th = QThread()
             stream.moveToThread(th)
             th.started.connect(stream.run)
+            self.th.append(th)
             th.start()
             stream.newImage.connect(self.update_stream)
 

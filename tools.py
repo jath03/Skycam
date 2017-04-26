@@ -1,6 +1,5 @@
 import sys
 
-
 class StdoutFilter(object):
     def __init__(self):
         self.out = sys.stdout

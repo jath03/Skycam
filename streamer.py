@@ -24,7 +24,6 @@ class Streamer(QObject):
             QCoreApplication.processEvents()
             time.sleep(.05)
             s, img = self.cam.read()
-            print('Camera working?', s)
             if not s:
                 self.cam.release()
                 continue

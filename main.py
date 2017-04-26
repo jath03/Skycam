@@ -10,10 +10,10 @@ from PyQt5.QtWidgets import QMainWindow, QWidget, QAction, QTabWidget, QApplicat
 from flask import Flask, Response
 from skycam import Skycam
 from streamer import StreamReciever
+from tools import StdoutFilter, StderrFilter
 
 
 class SkycamWidget(QWidget):
-    resizePic = pyqtSignal(int, int)
     def __init__(self, master, cam, streams=[]):
         print('initiating skycam widget')
         super().__init__()
@@ -34,8 +34,8 @@ class SkycamWidget(QWidget):
     def init_layout(self):
         hbox = QHBoxLayout()
         vbox = QVBoxLayout()
-        hbox.addLayout(vbox)
         hbox.addWidget(self.tw)
+        hbox.addLayout(vbox)
         self.setLayout(hbox)
 
 
@@ -59,6 +59,7 @@ class SkycamWidget(QWidget):
     @pyqtSlot(QImage, str)
     def update_stream(self, frame, id):
         pix = QPixmap.fromImage(frame)
+        pix = pix.scaledToHeight(self.frameGeometry().height() - 150)
         for id1, stream in self.streams.items():
             if id == id1:
                 stream.lb.setPixmap(pix)
@@ -77,7 +78,6 @@ class MyMainWindow(QMainWindow):
         print('showing ...')
         st = [StreamReciever(self, 'http://localhost:7777')]
         self.w = SkycamWidget(self, self.cam, st)
-        self.w.resizeEvent = self.img_resize
         self.show()
 
 
@@ -104,14 +104,9 @@ class MyMainWindow(QMainWindow):
         print(repr(s))
 
 
-    @pyqtSlot(object)
-    def img_resize(self, event):
-        print(event)
-
-
     @pyqtSlot()
     def exit(self):
-        self.w.skycam.streamer.cam.release()
+        self.cam.release()
         self.app.quit()
         sys.exit()
 
@@ -126,6 +121,8 @@ class MyMainWindow(QMainWindow):
 
 
 def main():
+    sys.stdout = StdoutFilter()
+    sys.stderr = StderrFilter()
     app = QApplication(sys.argv)
     window = MyMainWindow(app)
     sys.exit(app.exec_())

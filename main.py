@@ -1,20 +1,25 @@
 #!/usr/bin/python3.5
 import queue
 
+import cv2
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, QUrl, QThread, QObject
 import sys
 from PyQt5.QtGui import QKeySequence, QImage, QPixmap
 from PyQt5.QtWidgets import QMainWindow, QWidget, QAction, QTabWidget, QApplication, QBoxLayout, QHBoxLayout, \
     QVBoxLayout, QLabel
+from flask import Flask, Response
 from skycam import Skycam
 from streamer import StreamReciever
 
 
 class SkycamWidget(QWidget):
-    def __init__(self, streams=[]):
+    resizePic = pyqtSignal(int, int)
+    def __init__(self, master, cam, streams=[]):
         print('initiating skycam widget')
         super().__init__()
-        self.skycam = Skycam()
+        self.skycam = Skycam(self, cam)
+        self.master = master
+        self.master.setCentralWidget(self)
         self.streams = dict()
         self.th = list()
         for i in range(len(streams)):
@@ -30,7 +35,6 @@ class SkycamWidget(QWidget):
         hbox = QHBoxLayout()
         vbox = QVBoxLayout()
         hbox.addLayout(vbox)
-        hbox.addSpacing(1)
         hbox.addWidget(self.tw)
         self.setLayout(hbox)
 
@@ -52,32 +56,30 @@ class SkycamWidget(QWidget):
             th.start()
             stream.newImage.connect(self.update_stream)
 
-    @pyqtSlot(QImage, int)
+    @pyqtSlot(QImage, str)
     def update_stream(self, frame, id):
         pix = QPixmap.fromImage(frame)
-        for id1, stream in self.streams:
+        for id1, stream in self.streams.items():
             if id == id1:
                 stream.lb.setPixmap(pix)
 
 
 
 class MyMainWindow(QMainWindow):
-    def __init__(self, widget=None, app=None, *args, **kwargs):
-        print('initiating super')
+    def __init__(self, app, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.app = app
         self.init_menubar()
+        self.app = app
         self.fs = False
-        if widget is not None:
-            self.setCentralWidget(widget)
+        self.cam = cv2.VideoCapture(0)
         self.setGeometry(0, 0, 800, 600)
         self.move(self.app.desktop().screen().rect().center() - self.rect().center())
-        self.w = widget
-        self.w.skycam.streamer.errEvt.connect(self.pr)
-
-        self.setCentralWidget(self.w)
         print('showing ...')
+        st = [StreamReciever(self, 'http://localhost:7777')]
+        self.w = SkycamWidget(self, self.cam, st)
+        self.w.resizeEvent = self.img_resize
         self.show()
+
 
 
     def init_menubar(self):
@@ -95,13 +97,16 @@ class MyMainWindow(QMainWindow):
 
         file.addAction(quit)
         view.addAction(fullscreen)
+        self.show()
 
     @pyqtSlot(object)
     def pr(self, s):
         print(repr(s))
 
 
-
+    @pyqtSlot(object)
+    def img_resize(self, event):
+        print(event)
 
 
     @pyqtSlot()
@@ -122,8 +127,7 @@ class MyMainWindow(QMainWindow):
 
 def main():
     app = QApplication(sys.argv)
-    w = SkycamWidget(streams=[StreamReciever('http://localhost:7777')])
-    m = MyMainWindow(widget=w, app=app)
+    window = MyMainWindow(app)
     sys.exit(app.exec_())
 
 if __name__ == "__main__":

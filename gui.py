@@ -3,11 +3,11 @@ import queue
 from PyQt5 import QtCore
 
 import cv2
-from PyQt5.QtCore import pyqtSignal, pyqtSlot, QUrl, QThread, QObject
+from PyQt5.QtCore import pyqtSignal, pyqtSlot, QUrl, QThread, QObject, Qt
 import sys
-from PyQt5.QtGui import QKeySequence, QImage, QPixmap
+from PyQt5.QtGui import QKeySequence, QImage, QPixmap, QFont
 from PyQt5.QtWidgets import QMainWindow, QWidget, QAction, QTabWidget, QApplication, QBoxLayout, QHBoxLayout, \
-    QVBoxLayout, QLabel, QGridLayout, QScrollArea, QListWidget
+    QVBoxLayout, QLabel, QGridLayout, QScrollArea, QListWidget, QPushButton, QInputDialog
 from flask import Flask, Response
 from skycam import Skycam
 from streamer import StreamReciever
@@ -45,17 +45,20 @@ class SkycamWidget(QWidget):
 
     def init_streams(self):
         for id, stream in self.streams.items():
-            print('initiating stream', id)
-            lb = QLabel()
-            stream.id = id
-            stream.lb = lb
-            self.tw.addTab(stream.lb, 'Stream ' + id)
-            th = QThread()
-            stream.moveToThread(th)
-            th.started.connect(stream.run)
-            self.th.append(th)
-            th.start()
-            stream.newImage.connect(self.update_stream)
+            self.add_stream(id, stream)
+
+    def add_stream(self, id, stream):
+        print('initiating stream', id)
+        lb = QLabel()
+        stream.id = id
+        stream.lb = lb
+        self.tw.addTab(stream.lb, 'Stream ' + id)
+        th = QThread()
+        stream.moveToThread(th)
+        th.started.connect(stream.run)
+        self.th.append(th)
+        th.start()
+        stream.newImage.connect(self.update_stream)
 
     @pyqtSlot(QImage, str)
     def update_stream(self, frame, id):
@@ -75,7 +78,6 @@ class MyMainWindow(QMainWindow):
         self.fs = False
         self.settings = None
         self.cam = cv2.VideoCapture(0)
-        self.setGeometry(0, 0, 800, 600)
         self.move(self.app.desktop().screen().rect().center() - self.rect().center())
         print('showing ...')
         self.st = [StreamReciever(self, 'http://localhost:7777')]
@@ -135,7 +137,7 @@ class MyMainWindow(QMainWindow):
                 self.settings.windowState() & ~QtCore.Qt.WindowMinimized | QtCore.Qt.WindowActive)
             self.settings.activateWindow()
         else:
-            self.settings = Settings()
+            self.settings = Settings(self)
             self.settings.setWindowState(
                 self.settings.windowState() & ~QtCore.Qt.WindowMinimized | QtCore.Qt.WindowActive)
             self.settings.activateWindow()
@@ -153,31 +155,45 @@ class Settings(QWidget):
         self.master = master
         self.setWindowTitle('Settings')
         self.closed.connect(master.settings_closed)
+        self.init_layout()
         self.show()
 
     def init_layout(self):
-        grid = QGridLayout()
+        vbox = QVBoxLayout()
+        hbox = QHBoxLayout()
 
-
-        listw = QListWidget()
+        font = QFont()
+        font.setPointSize(15)
+        title = QLabel('Streams', self)
+        title.setFont(font)
+        title.setAlignment(Qt.AlignCenter)
+        self.listw = QListWidget()
         for stream in self.master.st:
-            listw.addItem('Stream ' + stream.address)
+            self.listw.addItem('Stream - ' + stream.address)
         scroll = QScrollArea()
-        scroll.setWidget(listw)
+        scroll.setWidget(self.listw)
 
-        grid.addWidget(scroll)
+        vbox.addWidget(title)
+        vbox.addWidget(scroll)
 
-        self.setLayout(grid)
+        new = QPushButton("New", self)
+        new.clicked.connect(self.new_stream)
+        hbox.addStretch(1)
+        hbox.addWidget(new)
+
+        vbox.addLayout(hbox)
+
+        self.setLayout(vbox)
 
     def closeEvent(self, event):
         self.closed.emit()
         event.accept()
 
+    def new_stream(self):
+        text, ok = QInputDialog.getText(self, 'Address', 'Enter the full url:')
+        if ok:
+            sr = StreamReciever(self.master, text)
+            self.master.st.append(sr)
+            self.master.w.add_stream(str(len(self.master.st)), sr)
+            self.listw.addItem('Stream - ' + text)
 
-def settings_main():
-    app = QApplication(sys.argv)
-    settings = Settings()
-    sys.exit(app.exec_())
-
-if __name__ == '__main__':
-    settings_main()

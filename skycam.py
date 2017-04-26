@@ -18,10 +18,6 @@ class Skycam(QObject):
         @self.fapp.route('/')
         def feed():
             return Response(self.streamer.stream(), mimetype='multipart/x-mixed-replace; boundary=frame')
-#        self.th = QThread()
-#        self.streamer.moveToThread(self.th)
-#        self.th.started.connect(partial(main, self.fapp, cam))
-#        self.th.start()
         self.th = FlaskThread(self.fapp)
         self.th.start()
 

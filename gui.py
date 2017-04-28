@@ -3,15 +3,16 @@ import queue
 from PyQt5 import QtCore
 
 import cv2
-from PyQt5.QtCore import pyqtSignal, pyqtSlot, QUrl, QThread, QObject, Qt
+from PyQt5.QtCore import pyqtSignal, pyqtSlot, QUrl, QThread, QObject, Qt, QPoint
 import sys
 from PyQt5.QtGui import QKeySequence, QImage, QPixmap, QFont
 from PyQt5.QtWidgets import QMainWindow, QWidget, QAction, QTabWidget, QApplication, QBoxLayout, QHBoxLayout, \
-    QVBoxLayout, QLabel, QGridLayout, QScrollArea, QListWidget, QPushButton, QInputDialog
+    QVBoxLayout, QLabel, QGridLayout, QScrollArea, QListWidget, QPushButton, QInputDialog, QListWidgetItem, QMenu
 from flask import Flask, Response
 from skycam import Skycam
 from streamer import StreamReciever
 from tools import StdoutFilter, StderrFilter
+from functools import partial
 
 
 class SkycamWidget(QWidget):
@@ -56,8 +57,9 @@ class SkycamWidget(QWidget):
         th = QThread()
         stream.moveToThread(th)
         th.started.connect(stream.run)
-        self.th.append(th)
+        stream.thread = th
         th.start()
+        self.streams[id] = stream
         stream.newImage.connect(self.update_stream)
 
     @pyqtSlot(QImage, str)
@@ -169,7 +171,9 @@ class Settings(QWidget):
         title.setAlignment(Qt.AlignCenter)
         self.listw = QListWidget()
         for stream in self.master.st:
-            self.listw.addItem('Stream - ' + stream.address)
+            lwi = QListWidgetItem('Stream - ' + stream.address, self.listw)
+            self.listw.setContextMenuPolicy(Qt.CustomContextMenu)
+            self.listw.customContextMenuRequested.connect(partial(self.open_menu, stream.id))
         scroll = QScrollArea()
         scroll.setWidget(self.listw)
 
@@ -193,7 +197,24 @@ class Settings(QWidget):
         text, ok = QInputDialog.getText(self, 'Address', 'Enter the full url:')
         if ok:
             sr = StreamReciever(self.master, text)
-            self.master.st.append(sr)
             self.master.w.add_stream(str(len(self.master.st)), sr)
+            self.master.st.append(sr)
             self.listw.addItem('Stream - ' + text)
 
+    @pyqtSlot(QPoint)
+    def open_menu(self, id, QPos):
+        self.menu = QMenu()
+        remove = self.menu.addAction('Remove Stream')
+        remove.triggered.connect(partial(self.remove_stream, id))
+        pos = self.listw.mapToGlobal(QPoint(0, 0))
+        self.menu.move(pos + QPos)
+        self.menu.show()
+
+    def remove_stream(self, id):
+        self.listw.takeItem(self.listw.currentRow())
+        for id1, stream in self.master.w.streams.items():
+            if id == id1:
+                self.master.w.tw.removeTab(self.master.w.tw.indexOf(stream.lb))
+                print(stream.id)
+                print(stream.thread)
+                stream.stop()

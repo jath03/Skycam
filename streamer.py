@@ -52,12 +52,15 @@ class StreamReciever(QObject):
 
     def run(self):
         cap = cv2.VideoCapture(self.address)
-        while cap.isOpened():
+        self._isrunning = True
+        while cap.isOpened() and self._isrunning:
             i, frame = cap.read()
             if i:
                 image = QImage(frame.tostring(), 640, 480, QImage.Format_RGB888).rgbSwapped()
                 self.newImage.emit(image, self.id)
 
+    def stop(self):
+        self._isrunning = False
 
 class FlaskThread(QThread):
     def __init__(self, application):

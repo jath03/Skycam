@@ -49,6 +49,7 @@ class StreamReciever(QObject):
     def __init__(self, master, address):
         super().__init__()
         self.address = address
+        self._isrunning = bool()
 
     def run(self):
         cap = cv2.VideoCapture(self.address)

@@ -30,6 +30,7 @@ class SkycamWidget(QWidget):
         self.init_tabwidget()
         self.init_streams()
         self.init_layout()
+        self.update_tabs()
         print('initiated skycam widget')
 
 
@@ -43,6 +44,11 @@ class SkycamWidget(QWidget):
 
     def init_tabwidget(self):
         self.tw = QTabWidget()
+        self.tb = self.tw.tabBar()
+
+    def update_tabs(self):
+        for id, stream in self.streams.items():
+            self.tb.moveTab(self.tw.indexOf(stream.lb), int(id))
 
     def init_streams(self):
         for id, stream in self.streams.items():
@@ -80,9 +86,10 @@ class MyMainWindow(QMainWindow):
         self.fs = False
         self.settings = None
         self.cam = cv2.VideoCapture(0)
+        self.resize(640, 480)
         self.move(self.app.desktop().screen().rect().center() - self.rect().center())
         print('showing ...')
-        self.st = [StreamReciever(self, 'http://localhost:7777')]
+        self.st = [StreamReciever(self, 'http://localhost:7777'), StreamReciever(self, 'http://96.10.1.168/mjpg/1/video.mjpg')]
         self.w = SkycamWidget(self, self.cam, self.st)
         self.setWindowTitle('Skycam')
         self.show()
@@ -108,7 +115,7 @@ class MyMainWindow(QMainWindow):
 
         view = self.bar.addMenu("View")
 
-        file.addAction(settings)
+#        file.addAction(settings) # Uncomment to add a settings menu, but be warned that it doesn't work
         file.addAction(quit)
         view.addAction(fullscreen)
 
@@ -197,7 +204,7 @@ class Settings(QWidget):
         text, ok = QInputDialog.getText(self, 'Address', 'Enter the full url:')
         if ok:
             sr = StreamReciever(self.master, text)
-            self.master.w.add_stream(str(len(self.master.st)), sr)
+            self.master.w.add_stream(str(len(self.master.w.streams)), sr)
             self.master.st.append(sr)
             self.listw.addItem('Stream - ' + text)
 
@@ -212,9 +219,17 @@ class Settings(QWidget):
 
     def remove_stream(self, id):
         self.listw.takeItem(self.listw.currentRow())
+        streams1 = None
         for id1, stream in self.master.w.streams.items():
             if id == id1:
                 self.master.w.tw.removeTab(self.master.w.tw.indexOf(stream.lb))
                 print(stream.id)
                 print(stream.thread)
                 stream.stop()
+                streams1 = {y:x for y, x in self.master.w.streams.items() if x._isrunning}
+            else:
+                continue
+        if streams1:
+            print(self.master.w.streams)
+            print(streams1)
+            self.master.w.streams = streams1

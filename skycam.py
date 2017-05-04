@@ -9,6 +9,7 @@ from functools import partial
 class Skycam(QObject):
     def __init__(self, master, cam, communication=None):
         super().__init__()
+        self.master = master
         if not communication:
             self.comm = Communication(self, '0x50')
         else:

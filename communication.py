@@ -21,3 +21,7 @@ class Communication(object):
             else:
                 st = ''.join([chr(byte) for byte in bytes_lst])
                 return st
+    def write_byte(num):
+        self.bus.write_byte(self.address, ord(char))
+    def read_byte():
+        return self.bus.read_byte(self.address)

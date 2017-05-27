@@ -21,7 +21,22 @@ class Skycam(QObject):
             return Response(self.streamer.stream(), mimetype='multipart/x-mixed-replace; boundary=frame')
         self.th = FlaskThread(self.fapp)
         self.th.start()
-
+    def move(self, direction):
+        '''Moves the Skycam in the direction specified
+Usage: Skycam.move(direction)
+where direction is either 0 for forward or 1 for backward'''
+        self.comm.write("move," + str(direction))
+    def pan(self, direction):
+        '''Pans the Skycam's camera in the direction specified
+Usage: Skycam.pan(direction)
+where direction is either 0 for right or 1 for left'''
+        self.comm.write("pan," + str(direction))
+    def tilt(self, direction):
+        '''Tilts the Skycam's camera in the direction specified
+Usage: Skycam.tilt(direction)
+where direction is either 0 for up or 1 for down'''
+        self.comm.write("tilt," + str(direction))
+    
 
 if __name__ == '__main__':
     sk = Skycam()

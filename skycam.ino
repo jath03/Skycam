@@ -43,7 +43,7 @@ void parseString(String s) {
       drive2.write(135);
     }
     else if (value == -1) {
-      var v = drive1.read();
+      int v = drive1.read();
       if (v > 90) {
         toSend = "1";
       } else if (v < 90) {

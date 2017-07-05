@@ -7,11 +7,11 @@ class Communication(object):
         self.address = address
         self.master = master
         self.bus = smbus.SMBus(1)
-    def write(msg):
+    def write(self, msg):
         for char in str(msg):
             self.bus.write_byte(self.address, ord(char))
         self.bus.write_byte(self.address, ord('\n'))
-    def read():
+    def read(self):
         bytes_lst = []
         while True:
             time.sleep(.2)
@@ -21,7 +21,7 @@ class Communication(object):
             else:
                 st = ''.join([chr(byte) for byte in bytes_lst])
                 return st
-    def write_byte(num):
+    def write_byte(self, num):
         self.bus.write_byte(self.address, ord(char))
-    def read_byte():
+    def read_byte(self):
         return self.bus.read_byte(self.address)

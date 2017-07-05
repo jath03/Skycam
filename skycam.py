@@ -11,7 +11,7 @@ class Skycam(QObject):
         super().__init__()
         self.master = master
         if not communication:
-            self.comm = Communication(self, '0x50')
+            self.comm = Communication(self, 0x50)
         else:
             self.comm = communication
         self.fapp = Flask(__name__)
@@ -25,7 +25,7 @@ class Skycam(QObject):
         '''Moves the Skycam in the direction specified
 Usage: Skycam.move(direction)
 where direction is either 0 for forward or 1 for backward'''
-        if direction:
+        if direction is not None:
             self.comm.write("move," + str(direction))
         else:
             self.comm.write("move,-1")
@@ -62,4 +62,6 @@ where direction is either 0 for up or 1 for down'''
             return int(self.comm.read())
 
 if __name__ == '__main__':
-    sk = Skycam()
+    import cv2
+    cam = cv2.VideoCapture(-1)
+    sk = Skycam(None, cam)

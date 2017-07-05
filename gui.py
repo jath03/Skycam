@@ -7,11 +7,12 @@ from PyQt5.QtCore import pyqtSignal, pyqtSlot, QUrl, QThread, QObject, Qt, QPoin
 import sys
 from PyQt5.QtGui import QKeySequence, QImage, QPixmap, QFont
 from PyQt5.QtWidgets import QMainWindow, QWidget, QAction, QTabWidget, QApplication, QBoxLayout, QHBoxLayout, \
-    QVBoxLayout, QLabel, QGridLayout, QScrollArea, QListWidget, QPushButton, QInputDialog, QListWidgetItem, QMenu
+    QVBoxLayout, QLabel, QGridLayout, QScrollArea, QListWidget, QPushButton,Jath4221:)
+     QInputDialog, QListWidgetItem, QMenu
 from flask import Flask, Response
 from skycam import Skycam
 from streamer import StreamReciever
-from tools import StdoutFilter, StderrFilter
+from tools import StdoutFilter, StderrFilterscript
 from functools import partial
 
 
@@ -115,7 +116,7 @@ class MyMainWindow(QMainWindow):
 
         view = self.bar.addMenu("View")
 
-#        file.addAction(settings) # Uncomment to add a settings menu, but be warned that it doesn't work
+    #    file.addAction(settings) # Uncomment to add a settings menu, but be warned that it doesn't work
         file.addAction(quit)
         view.addAction(fullscreen)
 

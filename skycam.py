@@ -21,22 +21,45 @@ class Skycam(QObject):
             return Response(self.streamer.stream(), mimetype='multipart/x-mixed-replace; boundary=frame')
         self.th = FlaskThread(self.fapp)
         self.th.start()
-    def move(self, direction):
+    def move(self, direction=None):
         '''Moves the Skycam in the direction specified
 Usage: Skycam.move(direction)
 where direction is either 0 for forward or 1 for backward'''
-        self.comm.write("move," + str(direction))
-    def pan(self, direction):
+        if direction:
+            self.comm.write("move," + str(direction))
+        else:
+            self.comm.write("move,-1")
+            return int(self.comm.read())
+    def pan(self, direction=None):
         '''Pans the Skycam's camera in the direction specified
 Usage: Skycam.pan(direction)
 where direction is either 0 for right or 1 for left'''
-        self.comm.write("pan," + str(direction))
+        if direction:
+            self.comm.write("pan," + str(direction))
+        else:
+            self.comm.write("pan,-1")
+            return int(self.comm.read())
     def tilt(self, direction):
         '''Tilts the Skycam's camera in the direction specified
 Usage: Skycam.tilt(direction)
 where direction is either 0 for up or 1 for down'''
-        self.comm.write("tilt," + str(direction))
-    
+        if direction:
+            self.comm.write("tilt," + str(direction))
+        else:
+            self.comm.write("tilt,-1")
+            return int(self.comm.read())
+    def pan_to(self, angle=None):
+        if angle:
+            self.comm.write("panto," + str(angle))
+        else:
+            self.comm.write("panto,-1")
+            return int(self.comm.read())
+    def tilt_to(self, angle=None):
+        if angle:
+            self.comm.write("tiltto," + str(angle))
+        else:
+            self.comm.write("tiltto,-1")
+            return int(self.comm.read())
 
 if __name__ == '__main__':
     sk = Skycam()

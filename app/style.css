@@ -1,0 +1,52 @@
+html {
+  font-family: verdana;
+}
+
+#header {
+  background-color: blue;
+  border: 1.5px solid #4da6ff;
+  text-align: center;
+  cursor: pointer;
+  color: #FFFFFF;
+}
+
+#drive-btns {
+  margin: 5px;
+  text-align: center;
+  width: 100% content-box;
+}
+
+#drive-btns button {
+  display: block;
+  background-color: #4da6ff;
+  border: 1.5px solid blue;
+  border-radius: 5px;
+  cursor: pointer;
+  color: #FFFFFF;
+  margin-top: 5px;
+  width: 100%;
+}
+
+#drive-btns button:first-child {
+  margin-top: auto;
+}
+
+#drive-btns button:hover {
+  background-color: blue;
+}
+#direction-container {
+  width: max-content;
+  text-align: center;
+}
+#direction {
+  font-weight: bold;
+  text-align: center;
+}
+
+#drive-container {
+  border: 5px solid blue;
+  margin-top: 10px;
+  max-width: 200px;
+  min-width: 175px;
+  text-align: center;
+}

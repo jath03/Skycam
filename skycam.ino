@@ -42,6 +42,14 @@ void parseString(String s) {
       drive1.write(135);
       drive2.write(135);
     }
+    else if (value == -1) {
+      var v = drive1.read();
+      if (v > 90) {
+        toSend = "1";
+      } else if (v < 90) {
+        toSend = "0";
+      }
+    }
     else {
       drive1.write(90);
       drive2.write(90);
@@ -85,7 +93,6 @@ void receiveRegister(int x){
     Serial.print("I Recieved ");
     Serial.println(value);
     parseString(value);
-    toSend = value;
     value = "";
   }
 }
@@ -134,6 +141,4 @@ void setup() {
   digitalWrite(7, LOW);
   pinMode(12, INPUT);
   delay(500);
-} 
-
-
+}

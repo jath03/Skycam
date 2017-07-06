@@ -6,6 +6,8 @@ from PyQt5.QtGui import QImage
 from PyQt5.QtWidgets import QApplication
 from flask import Flask, render_template, Response
 import cv2
+from picamera import PiCamera
+from picamera.array import PiRGBArray
 import json
 
 
@@ -17,16 +19,16 @@ class Streamer(QObject):
         super().__init__(*args, **kwargs)
         self.flipEvt.connect(self.flip)
         self.cam = cam
+        self.cam.resolution = (640, 480)
+        self.cam.framerate = 32
+        self.rawCapture = PiRGBArray(self.cam, size=(640, 480))
         self.flipped = False
 
     def stream(self):
-        while True:
+        for fr in self.cam.capture_continuous(self.rawCapture, format="bgr", use_video_port=True):
             QCoreApplication.processEvents()
             time.sleep(.05)
-            s, img = self.cam.read()
-            if not s:
-                self.cam.release()
-                continue
+            img = fr.array
             if self.flipped:
                 (h, w) = img.shape[:2]
                 center = (w / 2, h / 2)
@@ -34,6 +36,7 @@ class Streamer(QObject):
                 img = cv2.warpAffine(img, M, (w, h))
             s, jpg = cv2.imencode('.jpg', img)
             frame = jpg.tobytes()
+            self.rawCapture.truncate(0)
             yield b'--frame\r\nContent-Type: image/jpeg\r\nContent-Length:' + bytes(len(frame)) + b'\r\n\r\n' + frame + b'\r\n\r\n'
 
 
@@ -83,5 +86,6 @@ def main(fapp, cam):
         raise
 
 if __name__ == '__main__':
-    s = Streamer()
-    main(s)
+    cam = cv2.VideoCapture(-1)
+    s = Streamer(None, cam)
+    main(s.fapp, cam)

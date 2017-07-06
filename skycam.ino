@@ -24,6 +24,17 @@ void off() {
   digitalWrite(7, LOW);
 }
 
+String getDriveDirection() {
+  int g = drive1.read();
+  if (g > 90) {
+    return "1";
+  } else if (g < 90) {
+    return "0";
+  } else {
+    return "2";
+  }
+}
+
 void center() {
   pan.write(180);
   tilt.write(90);
@@ -37,22 +48,20 @@ void parseString(String s) {
     if (value == 0) {
       drive1.write(45);
       drive2.write(45);
+      toSend = getDriveDirection();
     }
     else if (value == 1) {
       drive1.write(135);
       drive2.write(135);
+      toSend = getDriveDirection();
     }
     else if (value == -1) {
-      int v = drive1.read();
-      if (v > 90) {
-        toSend = "1";
-      } else if (v < 90) {
-        toSend = "0";
-      }
+      toSend = getDriveDirection();
     }
     else {
       drive1.write(90);
       drive2.write(90);
+      toSend = getDriveDirection();
     }
   }
   else if (command == "pan") {

@@ -27,6 +27,7 @@ Usage: Skycam.move(direction)
 where direction is either 0 for forward or 1 for backward'''
         if direction is not None:
             self.comm.write("move," + str(direction))
+            return int(self.comm.read())
         else:
             self.comm.write("move,-1")
             return int(self.comm.read())

@@ -1,0 +1,17 @@
+asyncio
+click
+Flask
+itsdangerous
+Jinja
+MarkupSafe
+numpy
+pbr
+picamera
+six
+smbus
+stevedore
+virtualenv
+virtualenv-clone
+virtualenvwrapper
+websockets
+Werkzeug

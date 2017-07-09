@@ -68,12 +68,14 @@ void parseString(String s) {
     if (value == 0) {
       int cv = pan.read();
       pan.write(cv + 5);
-    }
-    else if (value == 1) {
+      toSend = String(cv + 5);
+    } else if (value == 1) {
       int cv = pan.read();
       pan.write(cv - 5);
-    }
-    else {
+      toSend = String(cv - 5);
+    } else if (value == -1) {
+      toSend = String(pan.read());
+    } else {
       pan.write(180);
     }
   }
@@ -81,12 +83,14 @@ void parseString(String s) {
     if (value == 0) {
       int cv = tilt.read();
       tilt.write(cv + 5);
-    }
-    else if (value == 1) {
+      toSend = String(cv + 5);
+    } else if (value == 1) {
       int cv = tilt.read();
       tilt.write(cv - 5);
-    }
-    else {
+      toSend = String(cv - 5);
+    } else if (value == -1) {
+      toSend = String(tilt.read());
+    } else {
       tilt.write(135);
     }
   }

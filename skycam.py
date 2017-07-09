@@ -35,8 +35,9 @@ where direction is either 0 for forward or 1 for backward'''
         '''Pans the Skycam's camera in the direction specified
 Usage: Skycam.pan(direction)
 where direction is either 0 for right or 1 for left'''
-        if direction:
+        if direction is not None:
             self.comm.write("pan," + str(direction))
+            return int(self.comm.read())
         else:
             self.comm.write("pan,-1")
             return int(self.comm.read())
@@ -44,8 +45,9 @@ where direction is either 0 for right or 1 for left'''
         '''Tilts the Skycam's camera in the direction specified
 Usage: Skycam.tilt(direction)
 where direction is either 0 for up or 1 for down'''
-        if direction:
+        if direction is not None:
             self.comm.write("tilt," + str(direction))
+            return int(self.comm.read())
         else:
             self.comm.write("tilt,-1")
             return int(self.comm.read())
@@ -63,6 +65,5 @@ where direction is either 0 for up or 1 for down'''
             return int(self.comm.read())
 
 if __name__ == '__main__':
-    import cv2
-    cam = cv2.VideoCapture(-1)
-    sk = Skycam(None, cam)
+    from picamera import PiCamera
+    sk = Skycam(None, PiCamera())

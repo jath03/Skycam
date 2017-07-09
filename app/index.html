@@ -12,20 +12,22 @@
 
 <body>
   <div id="header">
-    <h1>Test Skycam Webapp</h1>
+    <h1>Skycam</h1>
   </div>
   <div id="nav">
   </div>
-  <div id="drive-container">
+  <div class="container" id="drive">
     <h3>Drive</h3>
     <div id="drive-btns">
-      <button id="forward">forward</button>
-      <button id="stop">stop</button>
-      <button id="backward">backward</button>
+      <button class="btn" id="forward">forward</button>
+      <button class="btn" id="stop">stop</button>
+      <button class="btn" id="backward">backward</button>
     </div>
     <p id="direction">Current direction: <br/>Stopped</p>
   </div>
-  <img src="http://localhost:7777" />
+  <div class="container" id="stream">
+    <h3>Stream</h3>
+    <img src="http://192.168.5.14:7777" />
+  </div>
 </body>
-
 </html>

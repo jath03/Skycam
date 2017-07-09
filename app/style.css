@@ -18,13 +18,6 @@ html {
 
 #drive-btns button {
   display: block;
-  background-color: #4da6ff;
-  border: 1.5px solid blue;
-  border-radius: 5px;
-  cursor: pointer;
-  color: #FFFFFF;
-  margin-top: 5px;
-  width: 100%;
 }
 
 #drive-btns button:first-child {
@@ -43,10 +36,30 @@ html {
   text-align: center;
 }
 
-#drive-container {
+.container {
   border: 5px solid blue;
-  margin-top: 10px;
+  margin: 10px;
+  text-align: center;
+}
+#drive.container {
   max-width: 200px;
   min-width: 175px;
-  text-align: center;
+}
+
+#stream.container {
+  width: min-content;
+}
+img {
+  max-width: 320px;
+  max-height: 240px
+  border: 1.5px solid #4da6ff;
+}
+.btn {
+  background-color: #4da6ff;
+  border: 1.5px solid blue;
+  border-radius: 5px;
+  cursor: pointer;
+  color: #FFFFFF;
+  margin-top: 5px;
+  width: 100%;
 }

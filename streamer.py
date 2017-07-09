@@ -75,7 +75,7 @@ class FlaskThread(QThread):
         self.wait()
 
     def run(self):
-        self.application.run(host='localhost', port=7777, debug=False, use_reloader=False)
+        self.application.run(host='192.168.5.14', port=7777, debug=False, use_reloader=False)
 
 
 def main(fapp, cam):

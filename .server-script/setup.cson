@@ -3,13 +3,13 @@
 # If you cannot see secrets.cson in Atom, click on the treeview and press the letter i
 
 server:
-  location: ''
-  projectRoot: ''
+  location: '192.168.5.14'
+  projectRoot: '/home/jack/skycam'
   # login info is kept in secrets.cson
 
 options:
-  syncChangedFiles: yes
-  scriptOnRun:  ''
+  syncChangedFiles: no
+  scriptOnRun:  'main.py'
   scriptOnSave: ''
   useGitignore: yes
   logToConsole: yes

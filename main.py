@@ -5,7 +5,7 @@ import argparse
 
 
 parser = argparse.ArgumentParser(description="Skycam application")
-parser.add_argument("-w", "--web", action="store_true")
+parser.add_argument("-g", "--gui", action="store_true")
 args = parser.parse_args()
 
 def gui_main():
@@ -16,7 +16,7 @@ def gui_main():
     sys.exit(app.exec_())
 
 if __name__ == "__main__":
-    if args.web:
+    if not args.gui:
         import web
         # from skycam import Skycam
 

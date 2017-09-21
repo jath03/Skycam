@@ -18,8 +18,10 @@ def gui_main():
 if __name__ == "__main__":
     if not args.gui:
         import web
-        # from skycam import Skycam
-
-        web.main()
+        from skycam import Skycam
+        from picamera import PiCamera
+        cam = PiCamera()
+        sk = Skycam(None, cam)
+        web.main(sk)
     else:
         gui_main()

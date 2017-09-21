@@ -7,7 +7,7 @@ from PyQt5.QtCore import pyqtSignal, pyqtSlot, QUrl, QThread, QObject, Qt, QPoin
 import sys
 from PyQt5.QtGui import QKeySequence, QImage, QPixmap, QFont
 from PyQt5.QtWidgets import QMainWindow, QWidget, QAction, QTabWidget, QApplication, QBoxLayout, QHBoxLayout, \
-    QVBoxLayout, QLabel, QGridLayout, QScrollArea, QListWidget, QPushButton,Jath4221:)
+    QVBoxLayout, QLabel, QGridLayout, QScrollArea, QListWidget, QPushButton,
      QInputDialog, QListWidgetItem, QMenu
 from flask import Flask, Response
 from skycam import Skycam
